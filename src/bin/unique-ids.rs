@@ -1,10 +1,11 @@
 use gossip_glomers::{actors, maelstrom_protocol};
 use serde::{Deserialize, Serialize};
+use ulid::Ulid;
 use xtra::Actor;
 
-struct EchoNode;
+struct UniqueIdNode;
 
-impl xtra::Actor for EchoNode {}
+impl xtra::Actor for UniqueIdNode {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -12,11 +13,9 @@ impl xtra::Actor for EchoNode {}
 enum Payload {
     Init(maelstrom_protocol::InitPayload),
     InitOk,
-    Echo {
-        echo: String,
-    },
-    EchoOk {
-        echo: String,
+    Generate,
+    GenerateOk {
+        id: String,
     },
     #[serde(other)]
     Unknown,
@@ -36,7 +35,7 @@ impl maelstrom_protocol::Payload for Payload {
 }
 
 #[async_trait::async_trait]
-impl xtra::Handler<maelstrom_protocol::Message<Payload>> for EchoNode {
+impl xtra::Handler<maelstrom_protocol::Message<Payload>> for UniqueIdNode {
     async fn handle(
         &mut self,
         message: maelstrom_protocol::Message<Payload>,
@@ -44,16 +43,18 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for EchoNode {
     ) -> Option<maelstrom_protocol::Message<Payload>> {
         match &message.body.payload {
             Payload::Init(_) => Some(message.make_response(Payload::InitOk)),
-            Payload::Echo { echo } => {
-                Some(message.make_response(Payload::EchoOk { echo: echo.clone() }))
-            }
-            Payload::EchoOk { echo: _ } | Payload::InitOk | Payload::Unknown => None,
+            Payload::Generate => Some(message.make_response(Payload::GenerateOk {
+                id: Ulid::new().to_string(),
+            })),
+            Payload::GenerateOk { id: _ } | Payload::InitOk | Payload::Unknown => None,
         }
     }
 }
 
 #[tokio::main]
 async fn main() {
-    let addr = EchoNode.create(None).spawn(&mut xtra::spawn::Tokio::Global);
+    let addr = UniqueIdNode
+        .create(None)
+        .spawn(&mut xtra::spawn::Tokio::Global);
     actors::run_io(addr).await;
 }
