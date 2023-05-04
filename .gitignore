@@ -1,5 +1,6 @@
-# Created by https://www.toptal.com/developers/gitignore/api/rust,rust-analyzer,windows,linux,macos,vim
-# Edit at https://www.toptal.com/developers/gitignore?templates=rust,rust-analyzer,windows,linux,macos,vim
+### Maelstrom ###
+
+store/
 
 ### Linux ###
 *~
