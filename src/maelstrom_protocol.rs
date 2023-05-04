@@ -20,10 +20,7 @@ pub struct Body<P> {
     pub payload: P,
 }
 
-pub trait Payload: Sized + Send + Clone + Serialize + DeserializeOwned {
-    fn into_init(self) -> Option<InitPayload>;
-    fn make_init_ok() -> Self;
-}
+pub trait Payload: std::fmt::Debug + Sized + Send + Clone + Serialize + DeserializeOwned {}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InitPayload {
@@ -32,6 +29,18 @@ pub struct InitPayload {
 }
 
 impl<P> Message<P> {
+    pub fn new(src: String, dst: String, payload: P) -> Self {
+        Self {
+            src,
+            dst,
+            body: Body {
+                id: None,
+                in_reply_to: None,
+                payload,
+            },
+        }
+    }
+
     pub fn make_response(&self, payload: P) -> Self {
         Self {
             src: self.dst.clone(),
@@ -43,4 +52,11 @@ impl<P> Message<P> {
             },
         }
     }
+}
+
+impl<P> xtra::Message for Message<P>
+where
+    P: Payload + 'static,
+{
+    type Result = Option<Message<P>>;
 }

@@ -33,18 +33,7 @@ enum Payload {
     Unknown,
 }
 
-impl maelstrom_protocol::Payload for Payload {
-    fn into_init(self) -> Option<maelstrom_protocol::InitPayload> {
-        match self {
-            Payload::Init(v) => Some(v),
-            _ => None,
-        }
-    }
-
-    fn make_init_ok() -> Self {
-        Self::InitOk
-    }
-}
+impl maelstrom_protocol::Payload for Payload {}
 
 #[async_trait::async_trait]
 impl xtra::Handler<maelstrom_protocol::Message<Payload>> for SingleNodeBroadcastNode {
@@ -76,8 +65,11 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for SingleNodeBroadcast
 
 #[tokio::main]
 async fn main() {
+    let writer = actors::Writer::new()
+        .create(None)
+        .spawn(&mut xtra::spawn::Tokio::Global);
     let addr = SingleNodeBroadcastNode::default()
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(addr).await;
+    actors::run_io(addr, writer).await;
 }
