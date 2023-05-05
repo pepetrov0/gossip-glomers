@@ -181,11 +181,9 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for EfficientBroadcastN
 
 #[tokio::main]
 async fn main() {
-    let sender = actors::Sender::new()
+    let actors = actors::spawn_actors();
+    let node = EfficientBroadcastNode::new(actors.0.downgrade())
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    let node = EfficientBroadcastNode::new(sender.downgrade())
-        .create(None)
-        .spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(node, sender).await;
+    actors::run_io(node, actors).await;
 }

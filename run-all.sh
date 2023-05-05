@@ -6,3 +6,4 @@ bash run-single-node-broadcast.sh
 bash run-multi-node-broadcast.sh
 bash run-fault-tolerant-broadcast.sh
 bash run-efficient-broadcast.sh
+bash run-grow-only-counter.sh
