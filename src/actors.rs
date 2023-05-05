@@ -47,8 +47,6 @@ where
             .await
             .expect("failed to write newline to stdout");
         self.inner.flush().await.expect("failed to flush stdout");
-
-        eprintln!("sent: {:?}", message);
     }
 }
 
@@ -62,8 +60,6 @@ where
     while let Ok(Some(line)) = input.next_line().await {
         let message = serde_json::from_str::<maelstrom_protocol::Message<P>>(&line)
             .expect("failed to deserialize message");
-
-        eprintln!("received: {:?}", message);
 
         if let Some(message) = addr.send(message).await.ok().flatten() {
             writer
