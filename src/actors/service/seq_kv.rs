@@ -26,7 +26,7 @@ pub enum SeqKvPayload {
     },
     CasOk,
     #[serde(other)]
-    Uknown,
+    Unknown,
 }
 
 impl maelstrom_protocol::Payload for SeqKvPayload {}
