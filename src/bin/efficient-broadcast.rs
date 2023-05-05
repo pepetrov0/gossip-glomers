@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use xtra::Actor;
 
 struct EfficientBroadcastNode {
-    writer: xtra::WeakAddress<actors::Writer>,
+    sender: xtra::WeakAddress<actors::Sender>,
     init: Option<maelstrom_protocol::InitPayload>,
     neighbours: HashSet<String>,
     messages: HashSet<usize>,
@@ -13,9 +13,9 @@ struct EfficientBroadcastNode {
 }
 
 impl EfficientBroadcastNode {
-    pub fn new(writer: xtra::WeakAddress<actors::Writer>) -> Self {
+    pub fn new(sender: xtra::WeakAddress<actors::Sender>) -> Self {
         Self {
-            writer,
+            sender,
             init: None,
             neighbours: HashSet::new(),
             messages: HashSet::new(),
@@ -98,9 +98,9 @@ impl xtra::Handler<Gossip> for EfficientBroadcastNode {
                 },
             );
 
-            self.writer
+            self.sender
                 .do_send(actors::Output(message))
-                .expect("could not send output to writer");
+                .expect("could not send output to sender");
         }
     }
 }
@@ -181,11 +181,11 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for EfficientBroadcastN
 
 #[tokio::main]
 async fn main() {
-    let writer = actors::Writer::new()
+    let sender = actors::Sender::new()
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    let addr = EfficientBroadcastNode::new(writer.downgrade())
+    let node = EfficientBroadcastNode::new(sender.downgrade())
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(addr, writer).await;
+    actors::run_io(node, sender).await;
 }

@@ -42,11 +42,11 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for UniqueIdNode {
 
 #[tokio::main]
 async fn main() {
-    let writer = actors::Writer::new()
+    let sender = actors::Sender::new()
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    let addr = UniqueIdNode
+    let node = UniqueIdNode
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(addr, writer).await;
+    actors::run_io(node, sender).await;
 }

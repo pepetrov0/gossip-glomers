@@ -8,16 +8,16 @@ struct FaultTolerantBroadcastNode {
     init: Option<maelstrom_protocol::InitPayload>,
     messages: HashSet<usize>,
     neighbours: HashSet<String>,
-    writer: xtra::WeakAddress<actors::Writer>,
+    sender: xtra::WeakAddress<actors::Sender>,
 }
 
 impl FaultTolerantBroadcastNode {
-    pub fn new(writer: xtra::WeakAddress<actors::Writer>) -> Self {
+    pub fn new(sender: xtra::WeakAddress<actors::Sender>) -> Self {
         Self {
             init: None,
             messages: HashSet::new(),
             neighbours: HashSet::new(),
-            writer,
+            sender,
         }
     }
 }
@@ -81,9 +81,9 @@ impl xtra::Handler<Gossip> for FaultTolerantBroadcastNode {
                 },
             );
 
-            self.writer
+            self.sender
                 .do_send(actors::Output(message))
-                .expect("could not send output to writer");
+                .expect("could not send output to sender");
         }
     }
 }
@@ -133,11 +133,11 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for FaultTolerantBroadc
 
 #[tokio::main]
 async fn main() {
-    let writer = actors::Writer::new()
+    let sender = actors::Sender::new()
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    let addr = FaultTolerantBroadcastNode::new(writer.downgrade())
+    let node = FaultTolerantBroadcastNode::new(sender.downgrade())
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(addr, writer).await;
+    actors::run_io(node, sender).await;
 }

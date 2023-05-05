@@ -43,9 +43,9 @@ impl xtra::Handler<maelstrom_protocol::Message<Payload>> for EchoNode {
 
 #[tokio::main]
 async fn main() {
-    let writer = actors::Writer::new()
+    let sender = actors::Sender::new()
         .create(None)
         .spawn(&mut xtra::spawn::Tokio::Global);
-    let addr = EchoNode.create(None).spawn(&mut xtra::spawn::Tokio::Global);
-    actors::run_io(addr, writer).await;
+    let node = EchoNode.create(None).spawn(&mut xtra::spawn::Tokio::Global);
+    actors::run_io(node, sender).await;
 }
