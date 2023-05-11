@@ -11,7 +11,7 @@ This repository provides a comprehensive solution for the [Gossip Glomers Challe
 - [x] [Fault Tolerant Broadcast](https://github.com/pepetrov0/gossip-glomers/blob/main/src/bin/fault-tolerant-broadcast.rs)
 - [x] [Efficient Broadcast](https://github.com/pepetrov0/gossip-glomers/blob/main/src/bin/efficient-broadcast.rs)
 - [x] [Grow-Only Counter](https://github.com/pepetrov0/gossip-glomers/blob/main/src/bin/grow-only-counter.rs)
-- [ ] Single-Node Kafka-Style Log
+- [x] [Single-Node Kafka-Style Log](https://github.com/pepetrov0/gossip-glomers/blob/main/src/bin/single-node-kafka.rs)
 - [ ] Multi-Node Kafka-Style Log
 - [ ] Efficient Kafka-Style Log
 - [ ] Single-Node, Totally-Available Transactions
